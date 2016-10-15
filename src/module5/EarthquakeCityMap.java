@@ -170,8 +170,92 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		if (lastClicked != null) {
+			lastClicked.setSelected(false);
+			lastClicked = null;
+			unhideMarkers();
+			deselectMarkers();
+		}
+		
+		//Selects a marker that is under the cursor if there is one
+		selectMarkerIfClicked(quakeMarkers);
+		selectMarkerIfClicked(cityMarkers);
+		
+		//If a quake marker is selected
+		if (lastClicked != null){
+			
+			threatSelection(lastClicked);
+			
+			// Hides markers that are not selected
+			hideNotSelected(quakeMarkers);
+			hideNotSelected(cityMarkers);
+		}
 	}
 	
+	// Helper method to set lastClicked to the marker under the cursor
+	// if there is one
+	private void selectMarkerIfClicked(List<Marker> markers)
+	{
+		if (lastClicked != null) {
+			return;
+		}
+		for (Marker listItem : markers) {
+			if (listItem.isInside(map, mouseX, mouseY)) {
+				lastClicked = (CommonMarker)listItem;
+				lastClicked.setSelected(true);
+				return;
+			}
+		}
+	}
+	
+	// Helper method that selects city markers in a selected quakes threat zone
+	// or selects quakes that are a threat to a selected city marker
+	private void threatSelection(CommonMarker selected)
+	{
+		if (lastClicked == null) {
+			return;
+		}
+		//Check if the selected marker is a CityMarker or not
+		boolean isCity = selected instanceof CityMarker;
+		
+		// Selects quakes that have a threat radius large enough to affect the selected city
+		if (isCity == true) {
+			for (Marker quake : quakeMarkers) {
+				// Get threat radius for current quake
+				double threatRadius = ((EarthquakeMarker)quake).threatCircle();
+				
+				// Calculate if selected marker is in the quake threat area
+				double distance = selected.getDistanceTo(quake.getLocation());
+				//System.out.println(String.valueOf(distance));
+				if ((distance - threatRadius) < 0d) {
+					quake.setSelected(true);
+				}
+				
+			}
+		}
+		// If a quake is selected instead of a city, selects city markers that fall into the quake's threat radius
+		else {
+			double threatRadius = ((EarthquakeMarker)selected).threatCircle();
+			
+			for (Marker city : cityMarkers) {
+				double distance = city.getDistanceTo(selected.getLocation());
+				
+				if ((distance - threatRadius) < 0d) {
+					city.setSelected(true);
+				}
+			}
+		}
+	}
+	
+	// Hide markers that are not selected
+	private void hideNotSelected(List<Marker> markers)
+	{
+		for (Marker listItem : markers) {
+			if ( listItem.isSelected() == false ) {
+				listItem.setHidden(true);
+			}
+		}
+	}
 	
 	// loop over and unhide all markers
 	private void unhideMarkers() {
@@ -181,6 +265,17 @@ public class EarthquakeCityMap extends PApplet {
 			
 		for(Marker marker : cityMarkers) {
 			marker.setHidden(false);
+		}
+	}
+	
+	//loop over and deselect all markers
+	private void deselectMarkers() {
+		for (Marker marker : quakeMarkers) {
+			marker.setSelected(false);
+		}
+		
+		for (Marker marker : cityMarkers) {
+			marker.setSelected(false);
 		}
 	}
 	
