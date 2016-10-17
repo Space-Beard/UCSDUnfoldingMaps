@@ -11,15 +11,11 @@ import processing.core.PApplet;
 
 //Unfolding libraries
 import de.fhpotsdam.unfolding.UnfoldingMap;
-import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.data.PointFeature;
-import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.providers.OpenStreetMap;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
-import de.fhpotsdam.unfolding.data.Feature;
-import de.fhpotsdam.unfolding.utils.ScreenPosition;
 
 //Parsing library
 import parsing.ParseFeed;
@@ -95,7 +91,6 @@ public class EarthquakeCityMap extends PApplet {
 	    	// and assigns it to the "mag" variable. Used to colour the markers later
 	    	Object magObj = quake.getProperty("magnitude");
 	    	float mag = Float.parseFloat(magObj.toString());
-	    	int colorInt = (int) map(mag, 2.5f, 8f, 10, 255);
 	    	int minColor = color(66, 170, 244);
 	    	int medColor = color(244, 244, 66);
 	    	int majColor = color(244, 80, 66);
